@@ -1,0 +1,42 @@
+use AAFilter
+
+struct Oversampling:
+    n int
+    filtN int
+    aaFilter AAFilter
+    aiFilter AAFilter
+    osBuffer Data[float]
+
+def newOversampling(n int, filtN int = 4):
+    aaFilter = newAAFilter(filtN)
+    aiFilter = newAAFilter(filtN)
+    aaFilter.reset(n)
+    aiFilter.reset(n)
+    osBuffer = Data(n)
+    return Oversampling(n, filtN, aaFilter, aiFilter, osBuffer)
+
+def upsample(oversampling Oversampling, x):
+    #Aliases
+    osBuffer := oversampling.osBuffer
+    aiFilter := oversampling.aiFilter
+    n := oversampling.n
+
+    #Setup
+    osBuffer[0] = n * x
+    for i in 1..<n: osBuffer[i] = 0.0
+
+    #In-place oversampling
+    for k in 0..<n:
+        osBuffer[k] = aiFilter.process(osBuffer[k])
+
+def downsample(oversampling Oversampling):
+    #Aliases
+    osBuffer := oversampling.osBuffer
+    aaFilter := oversampling.aaFilter
+    n := oversampling.n
+    
+    #Calc downsampling
+    y = 0.0
+    for k in 0..<n:
+        y = aaFilter.process(osBuffer[k])
+    return y

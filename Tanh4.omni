@@ -1,0 +1,14 @@
+use Oversampling
+
+params:
+    amt {1}
+
+init:
+    oversampling = newOversampling(4)
+
+sample:
+    oversampling.upsample(in1)
+    for upsampled in oversampling.osBuffer:
+        upsampled = tanh(upsampled * amt)
+    y = oversampling.downsample()
+    out1 = y
