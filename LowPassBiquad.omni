@@ -1,5 +1,4 @@
 struct IIR:
-    order int
     b Data[float]
     a Data[float]
     z Data[float]
@@ -7,14 +6,14 @@ struct IIR:
 struct LowPassBiquad:
     iir IIR
 
-def newIIR(order = 3):
-    b = Data(order)
-    a = Data(order)
-    z = Data(order)
-    return IIR(order, b, a, z)
+def newIIR():
+    b = Data(3)
+    a = Data(3)
+    z = Data(3)
+    return IIR(b, a, z)
 
-def newLowPassBiquad(order = 3):
-    iir = newIIR(order)
+def newLowPassBiquad():
+    iir = newIIR()
     return LowPassBiquad(iir)
 
 def reset(biquad LowPassBiquad):
@@ -26,10 +25,11 @@ def setParameters(biquad LowPassBiquad, f, q):
     a := biquad.iir.a
 
     #Init
-    k = tanh(PI * f)
+    k = tan(PI * f)
     norm = 1.0 / (1.0 + k / q + k * k)
     b[0] = k * k * norm
     b[1] = 2.0 * b[0]
+    b[2] = b[0]
     a[1] = 2.0 * (k * k - 1.0) * norm
     a[2] = (1.0 - k / q + k * k) * norm
 
@@ -38,11 +38,9 @@ def process(biquad LowPassBiquad, x):
     b := biquad.iir.b
     a := biquad.iir.a
     z := biquad.iir.z
-    order := biquad.iir.order
-
+ 
     #Processing
     y = z[1] + x * b[0]
-    for i in 1..<order-1:
-        z[i] = z[i+1] + x * b[i] - y * a[i]
-    z[order-1] = x * b[order-1] - y * a[order-1]
+    z[1] = z[2] + x * b[1] - y * a[1]
+    z[2] = x * b[2] - y * a[2]
     return y

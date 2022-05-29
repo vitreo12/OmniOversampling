@@ -2,7 +2,6 @@ use AAFilter
 
 struct Oversampling:
     n int
-    filtN int
     aaFilter AAFilter
     aiFilter AAFilter
     osBuffer Data[float]
@@ -13,13 +12,13 @@ def newOversampling(n int, filtN int = 4):
     aaFilter.reset(n)
     aiFilter.reset(n)
     osBuffer = Data(n)
-    return Oversampling(n, filtN, aaFilter, aiFilter, osBuffer)
+    return Oversampling(n, aaFilter, aiFilter, osBuffer)
 
 def upsample(oversampling Oversampling, x):
     #Aliases
     osBuffer := oversampling.osBuffer
     aiFilter := oversampling.aiFilter
-    n := oversampling.n
+    n        := oversampling.n
 
     #Setup
     osBuffer[0] = n * x
@@ -33,7 +32,7 @@ def downsample(oversampling Oversampling):
     #Aliases
     osBuffer := oversampling.osBuffer
     aaFilter := oversampling.aaFilter
-    n := oversampling.n
+    n        := oversampling.n
     
     #Calc downsampling
     y = 0.0

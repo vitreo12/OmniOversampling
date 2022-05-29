@@ -4,11 +4,11 @@ params:
     amt {1}
 
 init:
-    oversampling = newOversampling(4)
+    OSIDX int = 4
+    oversampling = newOversampling(OSIDX)
 
 sample:
     oversampling.upsample(in1)
-    for upsampled in oversampling.osBuffer:
-        upsampled = tanh(upsampled * amt)
-    y = oversampling.downsample()
-    out1 = y
+    for i in 0..<OSIDX:
+        oversampling.osBuffer[i] = tanh(oversampling.osBuffer[i] * amt)
+    out1 = oversampling.downsample()
